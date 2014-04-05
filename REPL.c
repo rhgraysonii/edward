@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <editline/readline.h>
-#include <editeline/history.h>
+#include <editline/history.h>
 
 /* static buffer to limit input size */
 static char input[2048];
