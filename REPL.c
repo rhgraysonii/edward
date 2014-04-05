@@ -11,7 +11,7 @@ int main(int argc, char** argv) {
   /* Endless loop to run main REPL */
   while (1) {
     /* prompt output */
-    fputs("edward", stdout);
+    fputs("~edward:", stdout);
 
     /* check user input size to compare with buffer */
     fgets(input, 2048, stdin);
