@@ -1,0 +1,12 @@
+# Edward
+
+Edward is a Lisp. I am building this from the ground up myself in C and it is an ongoing project.
+It is also very basic and being developed by a noob. Pull requests are welcome. 
+
+### TODOS
+- lexical scoping
+- user defined types
+- macros
+- garbage collection
+- tail call optimization
+- static typing
