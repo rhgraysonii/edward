@@ -22,29 +22,43 @@ void add_history(char* unused) {}
 
 #endif
 
-/* define exponentiation because it is not built into C */
-int exp(int number, int exponent){
+/* define exponentiation because it is not built into C. this is done recursively */
+int expo(int a, int b){
   int result = 1;
-    while (exponent){
-      if (exponent&1){
-        result *= number;
-      }
-      exponent >>=1;
-      number *= number;
+  while (b){
+    if (b&1){
+      result *= a;
     }
+    b >>=1 ;
+    a *= a;
+  }
   return result;
 }
 
 /* Use operator string to see which operation to perform */
 long eval_op(long x, char* op, long y) {
-  if (strcmp(op, "+") == 0) { return x + y;     }
-  if (strcmp(op, "-") == 0) { return x - y;     }
-  if (strcmp(op, "*") == 0) { return x * y;     }
-  if (strcmp(op, "/") == 0) { return x / y;     }
-  if (strcmp(op, "%") == 0) { return x % y;     }
-  if (strcmp(op, "^") == 0) { return exp(x, y); }
+  if (strcmp(op, "+") == 0) { return x + y;      }
+  if (strcmp(op, "-") == 0) { return x - y;      }
+  if (strcmp(op, "*") == 0) { return x * y;      }
+  if (strcmp(op, "/") == 0) { return x / y;      }
+  if (strcmp(op, "%") == 0) { return x % y;      }
+  if (strcmp(op, "^") == 0) { return expo(x, y); }
   return 0;
 }
+
+/* lisp value struct */
+typedef struct {
+  int type;
+  long num;
+  int err;
+} lval;
+
+/* make enumeration of potential lval types */
+enum { LVAL_NUM, LVAL_ERR };
+
+/* enumeration of possible error types */
+enum {LERR_DIV-ZERO, LERR_BAD_OP, LERR_BAD_NUM
+
 
 long eval(mpc_ast_t* t) {
   
