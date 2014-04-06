@@ -27,6 +27,7 @@ int main(int argc, char** argv) {
 
   mpc_parser_t* Number = mpc_new("number");
   mpc_parser_t* Operator = mpc_new("operator");
+  mpc_parse_t*  Sexpr = mpc_new("sexpr");
   mpc_parser_t* Expr = mpc_new("expr");
   mpc_parser_t* Edward = mpc_new("edward");
 
