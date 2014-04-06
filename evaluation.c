@@ -75,7 +75,25 @@ lval lval_err(int x) {
 /* enumeration of possible error types */
 enum {LERR_DIV-ZERO, LERR_BAD_OP, LERR_BAD_NUM
 
+/* print an lval */
+void lval_print(lval v) {
+  switch(v.type) {
+    /* if type is num print */
+    case LVAL_NUM: printf("%li", v.num); break;
+    
+    /* if type is error */
+    case LVAL_ERR: 
+     /* check error and print it */
+    if(v.err == LERR_DIV_ZERO) { printf("Error: Divided by zero."); }
+    if(v.err == LERR_BAD_OP) { printf("Error: Invalid operator."); }
+    if(v.err == LERR_BAD_NUM) { printf("Error: Invalid number."); }
+    break;
+  }
+}
+/* print lval w/newline */
+lval_println(lval v) { lval_print(v); putchar('\n'); }
 
+/* evaluation setup */
 long eval(mpc_ast_t* t) {
   
   /* if number return it directly */ 
