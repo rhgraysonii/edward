@@ -109,20 +109,16 @@ lval eval_op(lval x, char* operator, lval y) {
 
 /* evaluation setup */
 lval eval(mpc_ast_t* t) {
-  /* if number return it directly */ 
-  if (strstr(t->tag, "number")) { 
-    /* check if theres error in conversion */
+
+  if (strstr(t->tag, "number")) {
+    /* Check if there is some error in conversion */
     long x = strtol(t->contents, NULL, 10);
-   
     return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
   }
-  /* operator is second child */
+
   char* operator = t->children[1]->contents;
-  
-  /* third child in placeholder */
   lval x = eval(t->children[2]);
-  
-  /* iterate children combining with op */
+
   int i = 3;
   while (strstr(t->children[i]->tag, "expr")) {
     x = eval_op(x, operator, eval(t->children[i]));
@@ -132,27 +128,27 @@ lval eval(mpc_ast_t* t) {
 }
 
 int main(int argc, char** argv) {
-
   mpc_parser_t* Number = mpc_new("number");
   mpc_parser_t* Operator = mpc_new("operator");
   mpc_parser_t* Expr = mpc_new("expr");
-  mpc_parser_t* Edward = mpc_new("edward");
+  mpc_parser_t* Lispy = mpc_new("edward");
 
   mpca_lang(MPC_LANG_DEFAULT,
     "                                                     \
       number   : /-?[0-9]+/ ;                             \
-      operator : '+' | '-' | '*' | '/' | '^' | '%';       \
+      operator : '+' | '-' | '*' | '/' ;                  \
       expr     : <number> | '(' <operator> <expr>+ ')' ;  \
-      edward   : /^/ <operator> <expr>+ /$/ ;             \
+      edward    : /^/ <operator> <expr>+ /$/ ;            \
     ",
-    Number, Operator, Expr, Edward);
+    Number, Operator, Expr, Lispy);
 
-  puts("Edward Version 0.0.0.0.3");
+  puts("Edward Version 0.0.0.0.4");
   puts("Press Ctrl+c to Exit\n");
 
   while (1) {
     char* input = readline("edward> ");
     add_history(input);
+
     mpc_result_t r;
     if (mpc_parse("<stdin>", input, Edward, &r)) {
       lval result = eval(r.output);
