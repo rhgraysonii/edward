@@ -105,16 +105,20 @@ void lval_print(lval v) {
 lval_println(lval v) { lval_print(v); putchar('\n'); }
 
 /* evaluation setup */
-long eval(mpc_ast_t* t) {
+lval eval(mpc_ast_t* t) {
   
   /* if number return it directly */ 
-  if (strstr(t->tag, "number")) { return atoi(t->contents); }
-  
+  if (strstr(t->tag, "number")) { 
+    /* check if theres error in conversion */
+    long x = stroi(t->contents, NULL, 10);
+   
+    return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
+  }
   /* operator is second child */
   char* operator = t->children[1]->contents;
   
   /* third child in placeholder */
-  long x = eval(t->children[2]);
+  lval x = eval(t->children[2]);
   
   /* iterate children combining with op */
   int i = 3;
