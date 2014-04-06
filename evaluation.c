@@ -58,14 +58,14 @@ void lval_print(lval v) {
   
     /* check error and print it */
     if(v.err == LERR_DIV_ZERO) { printf("Error: Divided by zero."); }
-    if(v.err == LERR_BAD_OP) { printf("Error: Invalid operator."); }
-    if(v.err == LERR_BAD_NUM) { printf("Error: Invalid number."); }
+    if(v.err == LERR_BAD_OP)   { printf("Error: Invalid operator."); }
+    if(v.err == LERR_BAD_NUM)  { printf("Error: Invalid number."); }
     break;
   }
 }
 
 /* print lval w/newline */
-lval_println(lval v) { lval_print(v); putchar('\n'); }
+void lval_println(lval v) { lval_print(v); putchar('\n'); }
   
 /* define exponentiation because it is not built into C */
 /* lval expo(int a, int b){
@@ -103,12 +103,12 @@ lval eval_op(lval x, char* operator, lval y) {
     lval lead     = lval_num(x.num);
     lval exponent = lval_num(y.num);
     return lval_num(expo(x.num, y.num)); 
-  }
+  }*/
   return lval_err(LERR_BAD_OP);
-} */
+} 
 
 /* evaluation setup */
-lval eval(mpc_ast_t* t) {
+void lval eval(mpc_ast_t* t) {
 
   if (strstr(t->tag, "number")) {
     /* Check if there is some error in conversion */
@@ -163,3 +163,6 @@ int main(int argc, char** argv) {
   mpc_cleanup(4, Number, Operator, Expr, Edward);
   return 0;
 }
+
+
+
