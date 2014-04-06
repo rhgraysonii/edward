@@ -22,7 +22,7 @@ void add_history(char* unused) {}
 
 #endif
 
-/* define exponentiation because it is not built into C. this is done recursively */
+/* define exponentiation because it is not built into C */
 int expo(int a, int b){
   int result = 1;
   while (b){
