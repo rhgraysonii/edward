@@ -18,40 +18,11 @@ void add_history(char* unused) {}
 #include <editline/readline.h>
 #endif
 
-/* define exponentiation because it is not built into C */
-int expo(int a, int b){
-  int result = 1;
-  while (b){
-    if (b&1){
-      result *= a;
-    }
-    b >>=1 ;
-    a *= a;
-  }
-  return result;
-}
+/* make enumeration of potential lval types */
+enum { LVAL_NUM, LVAL_ERR };
 
-/* Use operator string to see which operation to perform */
-long eval_op(long x, char* op, long y) {
-
-  /* if either is an error return it */
-  if (x.type == LVAL_ERR) { return x; }
-  if (y.type == LVAL_ERR) { return y; }
-
-  /* otherwise maths are already in the 'straight ballin' format and we continue with operations */
-  if (strcmp(op, "+") == 0) { return x + y;      }
-  if (strcmp(op, "-") == 0) { return x - y;      }
-  if (strcmp(op, "*") == 0) { return x * y;      }
-  
-  if (strcmp(op, "/") == 0) { 
-    /* if second operand is zero return error over result */  
-    returns  y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num);
-  }
-
-  if (strcmp(op, "%") == 0) { return x % y;      }
-  if (strcmp(op, "^") == 0) { return expo(x, y); }
-  return 0;
-}
+/* enumeration of possible error types */
+enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM };
 
 /* lisp value struct */
 typedef struct {
@@ -59,9 +30,6 @@ typedef struct {
   long num;
   int err;
 } lval;
-
-/* make enumeration of potential lval types */
-enum { LVAL_NUM, LVAL_ERR };
 
 /* number type lval */
 lval lval_num(long x) {
@@ -79,9 +47,6 @@ lval lval_err(int x) {
   return v;
 }
 
-/* enumeration of possible error types */
-enum {LERR_DIV-ZERO, LERR_BAD_OP, LERR_BAD_NUM
-
 /* print an lval */
 void lval_print(lval v) {
   switch(v.type) {
@@ -98,15 +63,51 @@ void lval_print(lval v) {
     break;
   }
 }
+
 /* print lval w/newline */
 lval_println(lval v) { lval_print(v); putchar('\n'); }
+  
+/* define exponentiation because it is not built into C */
+int expo(int a, int b){
+  int result = 1;
+  while (b){
+    if (b&1){
+      result *= a;
+    }
+    b >>=1 ;
+    a *= a;
+  }
+  return result;
+}
+
+/* Use operator string to see which operation to perform */
+lval eval_op(lval x, char* operator, lval y) {
+
+  /* if either is an error return it */
+  if (x.type == LVAL_ERR) { return x; }
+  if (y.type == LVAL_ERR) { return y; }
+
+  /* otherwise maths are already in the 'straight ballin' format and we continue with operations */
+  if (strcmp(operator, "+") == 0) { return lval_num(x.num + y.num);      }
+  if (strcmp(operator, "-") == 0) { return lval_num(x.num - y.num);      }
+  if (strcmp(operator, "*") == 0) { return lval_num(x.num * y.num);      }
+
+  if (strcmp(operator, "/") == 0) { 
+    /* if second operand is zero return error over result */  
+    return  y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num);
+  }
+
+  if (strcmp(operator, "%") == 0) { return lval_num(x.num % y.num);      }
+  // if (strcmp(operator, "^") == 0) { return lval_num(expo(x.num, y.num);  }
+  return lval_err(LERR_BAD_OP);
+}
 
 /* evaluation setup */
 lval eval(mpc_ast_t* t) {
   /* if number return it directly */ 
   if (strstr(t->tag, "number")) { 
     /* check if theres error in conversion */
-    long x = stroi(t->contents, NULL, 10);
+    long x = strtol(t->contents, NULL, 10);
    
     return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
   }
