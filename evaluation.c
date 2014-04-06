@@ -1,4 +1,5 @@
 #include "mpc.h"
+
 #ifdef _WIN32
 
 static char buffer[2048];
@@ -15,23 +16,25 @@ char* readline(char* prompt) {
 void add_history(char* unused) {}
 
 #else
+
 #include <editline/readline.h>
+
 #endif
 
-/* make enumeration of potential lval types */
-enum { LVAL_NUM, LVAL_ERR };
-
-/* enumeration of possible error types */
+/* enum of possible error typess */
 enum { LERR_DIV_ZERO, LERR_BAD_OP, LERR_BAD_NUM };
 
-/* lisp value struct */
+/* enum of possible lval types */
+enum { LVAL_NUM, LVAL_ERR };
+
+/* dec lval struct */
 typedef struct {
   int type;
   long num;
   int err;
 } lval;
 
-/* number type lval */
+/* num type lval */
 lval lval_num(long x) {
   lval v;
   v.type = LVAL_NUM;
@@ -39,7 +42,7 @@ lval lval_num(long x) {
   return v;
 }
 
-/* error type lval */
+/* error lval */
 lval lval_err(int x) {
   lval v;
   v.type = LVAL_ERR;
@@ -49,98 +52,73 @@ lval lval_err(int x) {
 
 /* print an lval */
 void lval_print(lval v) {
-  switch(v.type) {
-    /* if type is num print */
+  switch (v.type) {
+    /* if num print. */
     case LVAL_NUM: printf("%li", v.num); break;
-    
-    /* if type is error */
-    case LVAL_ERR: 
-  
-    /* check error and print it */
-    if(v.err == LERR_DIV_ZERO) { printf("Error: Divided by zero."); }
-    if(v.err == LERR_BAD_OP)   { printf("Error: Invalid operator."); }
-    if(v.err == LERR_BAD_NUM)  { printf("Error: Invalid number."); }
+
+    /* if error... */
+    case LVAL_ERR:
+      /* check which error */
+      if (v.err == LERR_DIV_ZERO) { printf("Error: Division By Zero!"); }
+      if (v.err == LERR_BAD_OP)   { printf("Error: Invalid Operator!"); }
+      if (v.err == LERR_BAD_NUM)  { printf("Error: Invalid Number!"); }
     break;
   }
 }
 
-/* print lval w/newline */
+/* print lval + newline */
 void lval_println(lval v) { lval_print(v); putchar('\n'); }
-  
-/* define exponentiation because it is not built into C */
-/* lval expo(int a, int b){
-  lval result = 1;
-  while (b){
-    if (b&1){
-      result *= a;
-    }
-    b >>=1 ;
-    a *= a;
-  }
-  return lval_num(result);
-}
-*/
 
-/* Use operator string to see which operation to perform */
-lval eval_op(lval x, char* operator, lval y) {
+lval eval_op(lval x, char* op, lval y) {
 
-  /* if either is an error return it */
+  /* if error return it */
   if (x.type == LVAL_ERR) { return x; }
   if (y.type == LVAL_ERR) { return y; }
 
-  /* otherwise maths are already in the 'straight ballin' format and we continue with operations */
-  if (strcmp(operator, "+") == 0) { return lval_num(x.num + y.num);      }
-  if (strcmp(operator, "-") == 0) { return lval_num(x.num - y.num);      }
-  if (strcmp(operator, "*") == 0) { return lval_num(x.num * y.num);      }
-
-  if (strcmp(operator, "/") == 0) { 
-    /* if second operand is zero return error over result */  
-    return  y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num);
+  /* otherwise do mathinz on the values that are now in 'straight ballin' form */
+  if (strcmp(op, "+") == 0) { return lval_num(x.num + y.num); }
+  if (strcmp(op, "-") == 0) { return lval_num(x.num - y.num); }
+  if (strcmp(op, "*") == 0) { return lval_num(x.num * y.num); }
+  if (strcmp(op, "%") == 0) { return lval_num(x.num % y.num); }
+  if (strcmp(op, "/") == 0) {
+    /* handle divide by zero horseshit */
+    return y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num);
   }
-
-  if (strcmp(operator, "%") == 0) { return lval_num(x.num % y.num);      }
-  /* if (strcmp(operator, "^") == 0) { 
-    lval lead     = lval_num(x.num);
-    lval exponent = lval_num(y.num);
-    return lval_num(expo(x.num, y.num)); 
-  }*/
   return lval_err(LERR_BAD_OP);
-} 
+}
 
-/* evaluation setup */
-void lval eval(mpc_ast_t* t) {
-
+lval eval(mpc_ast_t* t) {
   if (strstr(t->tag, "number")) {
-    /* Check if there is some error in conversion */
+    /* check if error in conversion */
     long x = strtol(t->contents, NULL, 10);
     return errno != ERANGE ? lval_num(x) : lval_err(LERR_BAD_NUM);
   }
-
-  char* operator = t->children[1]->contents;
+  char* op = t->children[1]->contents;  
   lval x = eval(t->children[2]);
 
   int i = 3;
   while (strstr(t->children[i]->tag, "expr")) {
-    x = eval_op(x, operator, eval(t->children[i]));
+    x = eval_op(x, op, eval(t->children[i]));
     i++;
   }
-  return x;
+  return x;  
 }
 
 int main(int argc, char** argv) {
+
   mpc_parser_t* Number = mpc_new("number");
   mpc_parser_t* Operator = mpc_new("operator");
   mpc_parser_t* Expr = mpc_new("expr");
-  mpc_parser_t* Lispy = mpc_new("edward");
+  mpc_parser_t* Edward = mpc_new("edward");
 
   mpca_lang(MPC_LANG_DEFAULT,
     "                                                     \
       number   : /-?[0-9]+/ ;                             \
-      operator : '+' | '-' | '*' | '/' ;                  \
+      operator : '+' | '-' | '*' | '/' | '%';             \
       expr     : <number> | '(' <operator> <expr>+ ')' ;  \
       edward    : /^/ <operator> <expr>+ /$/ ;            \
     ",
-    Number, Operator, Expr, Lispy);
+    Number, Operator, Expr, Edward);
 
   puts("Edward Version 0.0.0.0.4");
   puts("Press Ctrl+c to Exit\n");
@@ -163,6 +141,3 @@ int main(int argc, char** argv) {
   mpc_cleanup(4, Number, Operator, Expr, Edward);
   return 0;
 }
-
-
-
