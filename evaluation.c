@@ -1,5 +1,4 @@
 #include "mpc.h"
-
 #ifdef _WIN32
 
 static char buffer[2048];
@@ -16,10 +15,7 @@ char* readline(char* prompt) {
 void add_history(char* unused) {}
 
 #else
-
 #include <editline/readline.h>
-
-
 #endif
 
 /* define exponentiation because it is not built into C */
@@ -94,7 +90,8 @@ void lval_print(lval v) {
     
     /* if type is error */
     case LVAL_ERR: 
-     /* check error and print it */
+  
+    /* check error and print it */
     if(v.err == LERR_DIV_ZERO) { printf("Error: Divided by zero."); }
     if(v.err == LERR_BAD_OP) { printf("Error: Invalid operator."); }
     if(v.err == LERR_BAD_NUM) { printf("Error: Invalid number."); }
@@ -106,7 +103,6 @@ lval_println(lval v) { lval_print(v); putchar('\n'); }
 
 /* evaluation setup */
 lval eval(mpc_ast_t* t) {
-  
   /* if number return it directly */ 
   if (strstr(t->tag, "number")) { 
     /* check if theres error in conversion */
@@ -149,25 +145,19 @@ int main(int argc, char** argv) {
   puts("Press Ctrl+c to Exit\n");
 
   while (1) {
-
     char* input = readline("edward> ");
     add_history(input);
-
     mpc_result_t r;
     if (mpc_parse("<stdin>", input, Edward, &r)) {
-
-      long result = eval(r.output);
-      printf("%li\n", result);
+      lval result = eval(r.output);
+      lval_println(result);
       mpc_ast_delete(r.output);
-      
     } else {    
       mpc_err_print(r.error);
       mpc_err_delete(r.error);
     }
     free(input);
   }
-
   mpc_cleanup(4, Number, Operator, Expr, Edward);
-
   return 0;
 }
