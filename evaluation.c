@@ -56,6 +56,22 @@ typedef struct {
 /* make enumeration of potential lval types */
 enum { LVAL_NUM, LVAL_ERR };
 
+/* number type lval */
+lval lval_num(long x) {
+  lval v;
+  v.type = LVAL_NUM;
+  v.num = x;
+  return v;
+}
+
+/* error type lval */
+lval lval_err(int x) {
+  lval v;
+  v.type = LVAL_ERR;
+  v.err = x;
+  return v;
+}
+
 /* enumeration of possible error types */
 enum {LERR_DIV-ZERO, LERR_BAD_OP, LERR_BAD_NUM
 
