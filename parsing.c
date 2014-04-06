@@ -5,7 +5,7 @@
 static char buffer[2048];
 
 char* readline(char* prompt) {
-  fputs("lispy> ", stdout);
+  fputs("edward> ", stdout);
   fgets(buffer, 2048, stdin);
   char* cpy = malloc(strlen(buffer)+1);
   strcpy(cpy, buffer);
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
   mpc_parser_t* Number   = mpc_new("number");
   mpc_parser_t* Operator = mpc_new("operator");
   mpc_parser_t* Expr     = mpc_new("expr");
-  mpc_parser_t* Edward   = mpc_new("lispy");
+  mpc_parser_t* Edward   = mpc_new("edward");
   
   /* parser language defintions */
   mpca_lang(MPC_LANG_DEFAULT,
@@ -44,13 +44,13 @@ int main(int argc, char** argv) {
   
   while (1) {
   
-    char* input = readline("lispy> ");
+    char* input = readline("edward> ");
     add_history(input);
     
     /* parse user input */
     mpc_result_t r;
     if (mpc_parse("<stdin>", input, Edward, &r)) {
-      /* when successful print and delete the AST */
+      /* else, print and delete error */
       mpc_ast_print(r.output);
       mpc_ast_delete(r.output);
     } else {
