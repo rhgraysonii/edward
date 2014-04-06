@@ -8,7 +8,13 @@ enum { LVAL_NUM, LVAL_ERR, LVAL_SYM, LVAL_SEXPR };
 typedef struct {
   int type;
   long num;
-  int err;
+  /* error and sym types have string properties */
+  char* err;
+  char* sym;
+
+  /* count and pointer to list of lvals */
+  int count;
+  struct lval** cell;
 } lval;
 
 /* num type lval */
