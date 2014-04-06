@@ -37,10 +37,21 @@ int expo(int a, int b){
 
 /* Use operator string to see which operation to perform */
 long eval_op(long x, char* op, long y) {
+
+  /* if either is an error return it */
+  if (x.type == LVAL_ERR) { return x; }
+  if (y.type == LVAL_ERR) { return y; }
+
+  /* otherwise maths are already in the 'straight ballin' format and we continue with operations */
   if (strcmp(op, "+") == 0) { return x + y;      }
   if (strcmp(op, "-") == 0) { return x - y;      }
   if (strcmp(op, "*") == 0) { return x * y;      }
-  if (strcmp(op, "/") == 0) { return x / y;      }
+  
+  if (strcmp(op, "/") == 0) { 
+    /* if second operand is zero return error over result */  
+    returns  y.num == 0 ? lval_err(LERR_DIV_ZERO) : lval_num(x.num / y.num);
+  }
+
   if (strcmp(op, "%") == 0) { return x % y;      }
   if (strcmp(op, "^") == 0) { return expo(x, y); }
   return 0;
