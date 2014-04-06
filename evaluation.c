@@ -68,8 +68,8 @@ void lval_print(lval v) {
 lval_println(lval v) { lval_print(v); putchar('\n'); }
   
 /* define exponentiation because it is not built into C */
-int expo(int a, int b){
-  int result = 1;
+/* lval expo(int a, int b){
+  lval result = 1;
   while (b){
     if (b&1){
       result *= a;
@@ -77,8 +77,9 @@ int expo(int a, int b){
     b >>=1 ;
     a *= a;
   }
-  return result;
+  return lval_num(result);
 }
+*/
 
 /* Use operator string to see which operation to perform */
 lval eval_op(lval x, char* operator, lval y) {
@@ -98,9 +99,13 @@ lval eval_op(lval x, char* operator, lval y) {
   }
 
   if (strcmp(operator, "%") == 0) { return lval_num(x.num % y.num);      }
-  // if (strcmp(operator, "^") == 0) { return lval_num(expo(x.num, y.num);  }
+  /* if (strcmp(operator, "^") == 0) { 
+    lval lead     = lval_num(x.num);
+    lval exponent = lval_num(y.num);
+    return lval_num(expo(x.num, y.num)); 
+  }
   return lval_err(LERR_BAD_OP);
-}
+} */
 
 /* evaluation setup */
 lval eval(mpc_ast_t* t) {
