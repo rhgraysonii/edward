@@ -34,10 +34,11 @@ int main(int argc, char** argv) {
     "                                                     \
       number   : /-?[0-9]+/ ;                             \
       operator : '+' | '-' | '*' | '/' | '%';             \
+      sexpr    : '(' <expr> ')';                          \
       expr     : <number> | '(' <operator> <expr>+ ')' ;  \
-      edward    : /^/ <operator> <expr>+ /$/ ;            \
+      edward   : /^/ <operator> <expr>+ /$/ ;             \
     ",
-    Number, Operator, Expr, Edward);
+    Number, Operator, Sexpr, Expr, Edward);
 
   puts("Edward Version 0.0.0.0.4");
   puts("Press Ctrl+c to Exit\n");
@@ -57,6 +58,6 @@ int main(int argc, char** argv) {
     }
     free(input);
   }
-  mpc_cleanup(4, Number, Operator, Expr, Edward);
+  mpc_cleanup(5, Number, Operator, Sexpr, Expr, Edward);
   return 0;
 }
