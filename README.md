@@ -5,7 +5,8 @@ I am developing this with a goal of ruby-esque syntax and method functionality c
 
 
 To Compile:
-cc -std=c99 -Wall evaluation.c mpc.c -ledit -lm -o evaluation
+
+    cc -std=c99 -Wall evaluation.c mpc.c -ledit -lm -o evaluation
 
 It is also very basic and being developed by a noob. Pull requests are welcome. 
 
