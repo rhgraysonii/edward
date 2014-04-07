@@ -28,6 +28,7 @@ int main(int argc, char** argv) {
   mpc_parser_t* Number = mpc_new("number");
   mpc_parser_t* Operator = mpc_new("operator");
   mpc_parse_t*  Sexpr = mpc_new("sexpr");
+  mpc_parse_t* Qexpr = mpc_new("qexpr");
   mpc_parser_t* Expr = mpc_new("expr");
   mpc_parser_t* Edward = mpc_new("edward");
 
@@ -36,10 +37,11 @@ int main(int argc, char** argv) {
       number   : /-?[0-9]+/ ;                             \
       operator : '+' | '-' | '*' | '/' | '%';             \
       sexpr    : '(' <expr> ')';                          \
+      qexpr    : '{' <expr> '}';                          \
       expr     : <number> | '(' <operator> <expr>+ ')' ;  \
       edward   : /^/ <operator> <expr>+ /$/ ;             \
     ",
-    Number, Operator, Sexpr, Expr, Edward);
+    Number, Operator, Sexpr, Qexpr, Expr, Edward);
 
   puts("Edward Version 0.0.0.0.4");
   puts("Press Ctrl+c to Exit\n");
@@ -59,6 +61,6 @@ int main(int argc, char** argv) {
     }
     free(input);
   }
-  mpc_cleanup(5, Number, Operator, Sexpr, Expr, Edward);
+  mpc_cleanup(6, Number, Operator, Sexpr, Qexpr, Expr, Edward);
   return 0;
 }
